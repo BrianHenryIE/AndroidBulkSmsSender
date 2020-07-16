@@ -1,13 +1,18 @@
 package spartons.com.prosmssenderapp.activities.sendBulkSms.ui
 
+import FileUriUtils
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.FileUtils
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +22,17 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import spartons.com.prosmssenderapp.R
 import spartons.com.prosmssenderapp.activities.sendBulkSms.adapter.PreviewContactAdapter
 import spartons.com.prosmssenderapp.activities.sendBulkSms.viewModel.SendBulkSmsViewModel
+import spartons.com.prosmssenderapp.helper.PICK_CSV_FILE
 import spartons.com.prosmssenderapp.helper.SharedPreferenceHelper
 import spartons.com.prosmssenderapp.helper.SharedPreferenceHelper.Companion.BULK_SMS_PREFERRED_CARRIER_NUMBER
 import spartons.com.prosmssenderapp.helper.SharedPreferenceHelper.Companion.BULK_SMS_PREFERRED_MULTIPLE_CARRIER_NUMBER_FLAG
 import spartons.com.prosmssenderapp.helper.UiHelper
 import spartons.com.prosmssenderapp.util.*
 import timber.log.Timber
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import org.apache.commons.io.IOUtils
 
 /**
  * Ahsen Saeed}
@@ -101,8 +111,8 @@ class SendBulkSmsActivity : AppCompatActivity(){
         viewModel.uiState.observe(this, Observer {
             val uiModel = it ?: return@Observer
             sendBulkSmsProgressBar.visibility = if (uiModel.showProgress) VISIBLE else GONE
-            if (uiModel.contactList != null && !uiModel.contactList.consumed)
-                uiModel.contactList.consume()?.let { contactList ->
+            if (uiModel.contactMessageList != null && !uiModel.contactMessageList.consumed)
+                uiModel.contactMessageList.consume()?.let { contactList ->
                     sendBulkSmsChooseFileButton.text =
                         getResourceString(R.string.add_another_text_file)
                     previewAdapter.submitList(contactList)
@@ -149,11 +159,6 @@ class SendBulkSmsActivity : AppCompatActivity(){
                 )
                 return@setOnClickListener
             }
-            if (sendBulkSmsTextMessageEditText.text.toString().isEmpty()) {
-                sendBulkSmsTextMessageLayout.helperText =
-                    getResourceString(R.string.sms_content_cannot_be_empty)
-                return@setOnClickListener
-            }
             if (isHasPermission(Manifest.permission.SEND_SMS)) sendBulkSms()
             else
                 askPermission(
@@ -162,14 +167,6 @@ class SendBulkSmsActivity : AppCompatActivity(){
                 )
         }
 
-        /**
-         * listening for data added to bulk sms edit text and hide the helper text if it is showing.
-         */
-
-        sendBulkSmsTextMessageEditText.doOnTextChanged { text, _, _, _ ->
-            if (text != null && text.isNotEmpty())
-                sendBulkSmsTextMessageLayout.isHelperTextEnabled = false
-        }
     }
 
     private fun sendBulkSms() {
@@ -182,8 +179,7 @@ class SendBulkSmsActivity : AppCompatActivity(){
                 )
             viewModel.checkIfWorkerIsIdle() -> {
                 viewModel.sendBulkSms(
-                    currentContacts.toTypedArray(),
-                    sendBulkSmsTextMessageEditText.text.toString()
+                    currentContacts.toTypedArray()
                 )
                 uiHelper.showSimpleMaterialDialog(
                     this, R.string.bulk_sms_sent,
@@ -199,8 +195,43 @@ class SendBulkSmsActivity : AppCompatActivity(){
     }
 
     private fun showFileSelectorDialog() {
-        uiHelper.showSelectContactFileDialog(this) { selectedFile ->
-            viewModel.handleSelectedFile(selectedFile)
+        showSelectContactFileDialog(this)
+        //{ selectedFile ->
+        //    viewModel.handleSelectedFile(selectedFile)
+        //}
+    }
+
+    private fun showSelectContactFileDialog(activity: Activity) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "text/csv"
+        }
+
+        ActivityCompat.startActivityForResult(activity, intent, PICK_CSV_FILE, null)
+    }
+
+     override fun onActivityResult(
+        requestCode: Int, resultCode: Int, resultData: Intent?) {
+         super.onActivityResult(requestCode, resultCode, resultData)
+        if (requestCode == PICK_CSV_FILE
+            && resultCode == Activity.RESULT_OK) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            resultData?.data?.also { uri ->
+                var path = FileUriUtils(this.baseContext).getPath(uri)
+                var fileName = path.substring(path.lastIndexOf("/"));
+
+                val parcelFileDescriptor = this.baseContext.contentResolver.openFileDescriptor(uri, "r", null)
+
+                parcelFileDescriptor?.let {
+                    val inputStream = FileInputStream(parcelFileDescriptor.fileDescriptor)
+                    val file = File(this.baseContext.cacheDir, fileName)
+                    val outputStream = FileOutputStream(file)
+                    IOUtils.copy(inputStream, outputStream)
+                    viewModel.handleSelectedFile(file)
+                }
+                // Perform operations on the document using its URI.
+            }
         }
     }
 

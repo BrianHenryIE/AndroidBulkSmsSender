@@ -30,8 +30,9 @@ class PreviewContactViewHolder constructor(override val containerView: View) :
         this.clickClosure = clickClosure
     }
 
-    fun bind(contact: String) {
+    fun bind(contact: String, message: String) {
         smsContactUserSinglePhoneTextView.text = contact
+        smsContactUserMessageTextView.text = message
     }
 
     companion object {

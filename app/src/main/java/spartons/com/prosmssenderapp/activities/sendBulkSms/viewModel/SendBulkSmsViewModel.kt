@@ -12,7 +12,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import spartons.com.prosmssenderapp.R
-import spartons.com.prosmssenderapp.activities.sendBulkSms.data.toSmsContact
 import spartons.com.prosmssenderapp.backend.MyCustomApplication
 import spartons.com.prosmssenderapp.helper.NotificationIdHelper
 import spartons.com.prosmssenderapp.helper.SharedPreferenceHelper
@@ -26,10 +25,10 @@ import spartons.com.prosmssenderapp.util.Event
 import spartons.com.prosmssenderapp.util.enqueueWorker
 import spartons.com.prosmssenderapp.util.subscriptionManager
 import spartons.com.prosmssenderapp.workers.SendBulkSmsWorker
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileReader
-
+import com.github.doyaaaaaken.kotlincsv.client.*
+import spartons.com.prosmssenderapp.activities.sendBulkSms.data.SmsContactMessage
+import spartons.com.prosmssenderapp.activities.sendBulkSms.data.toSmsContactMessage
 
 /**
  * Ahsen Saeed}
@@ -74,46 +73,44 @@ class SendBulkSmsViewModel constructor(
     }
 
     private suspend fun emitUiState(
-        showProgress: Boolean = false, contactList: Event<List<String>>? = null,
+        showProgress: Boolean = false, contactMessageList: Event<List<SmsContactMessage>>? = null,
         showMessage: Event<Int>? = null, noDeviceNumber: Boolean = false,
         showMultipleCarrierNumber: Event<List<String>>? = null
     ) = withContext(Dispatchers.Main) {
-        SendBulkSmsUiModel(
-            showProgress, contactList,
-            showMessage, noDeviceNumber, showMultipleCarrierNumber
-        ).also {
-            _uiState.value = it
+        if (contactMessageList != null) {
+            SendBulkSmsUiModel(
+                showProgress, contactMessageList,
+                showMessage, noDeviceNumber, showMultipleCarrierNumber
+            ).also {
+                _uiState.value = it
+            }
         }
     }
 
     fun handleSelectedFile(selectedFile: File) {
         viewModelScope.launch(coroutineContext) {
             emitUiState(showProgress = true)
-            BufferedReader(FileReader(selectedFile)).use {
-                val filteredContactList = it.readLines()
-                    .filter { contactNumber ->
-                        contactNumber.length > 6
-                    }
-                if (filteredContactList.isNotEmpty())
-                    emitUiState(contactList = Event(filteredContactList))
-                else
-                    emitUiState(showMessage = Event(R.string.the_selected_file_is_empty))
+            val filteredContactMessageList = CsvReader().readAll(selectedFile).filter { contactNumberMessage ->
+                contactNumberMessage[0].length > 6 }.map { toSmsContactMessage(it[0], it[1]) }
+            if (filteredContactMessageList.isNotEmpty()) {
+                emitUiState(contactMessageList = Event(filteredContactMessageList))
             }
+            else
+                emitUiState(showMessage = Event(R.string.the_selected_file_is_empty))
         }
     }
 
     fun checkIfWorkerIsIdle() =
         sharedPreferenceHelper.getString(BULKS_SMS_PREVIOUS_WORKER_ID) == null
 
-    fun sendBulkSms(contactList: Array<String>, smsContent: String) {
+    fun sendBulkSms(contactMessageList: Array<SmsContactMessage>) {
         viewModelScope.launch(coroutineContext) {
             val carrierName =
                 sharedPreferenceHelper.getString(BULK_SMS_PREFERRED_CARRIER_NUMBER)?.split(
                     CARRIER_NAME_SPLITTER
                 )?.get(1) ?: ""
             val bulkSms = BulkSms(
-                smsContacts = contactList.map { it.toSmsContact() }.toList(),
-                smsContent = smsContent, startDateTime = System.currentTimeMillis(),
+                smsContactsMessages = contactMessageList.map{ toSmsContactMessage(it.contactNumber, it.message) }.toList(), startDateTime = System.currentTimeMillis(),
                 carrierName = carrierName
             )
             val rowId = bulkSmsDao.insert(bulkSms)
@@ -131,7 +128,7 @@ class SendBulkSmsViewModel constructor(
 
 data class SendBulkSmsUiModel(
     val showProgress: Boolean,
-    val contactList: Event<List<String>>?,
+    val contactMessageList: Event<List<SmsContactMessage>>,
     val showMessage: Event<Int>?,
     val noDeviceNumber: Boolean,
     val showMultipleCarrierNumber: Event<List<String>>?

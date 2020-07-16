@@ -9,11 +9,12 @@ import kotlinx.serialization.Serializable
  * 10/30/19}
  */
 
-fun String.toSmsContact() =
-    SmsContact(this)
+fun toSmsContactMessage(contact:String, message: String) =
+    SmsContactMessage(contact, message)
 
 @Serializable
-data class SmsContact(
+data class SmsContactMessage(
     val contactNumber: String,
+    val message: String,
     var isSent: Boolean = false
 )

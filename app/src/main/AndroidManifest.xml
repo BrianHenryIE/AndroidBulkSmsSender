@@ -4,6 +4,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="spartons.com.prosmssenderapp"
           android:targetSandboxVersion="1"
+          android:requestLegacyExternalStorage="true"
           tools:ignore="UnusedAttribute">
 
     <dist:module dist:instant="true"/>
