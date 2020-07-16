@@ -83,9 +83,9 @@ class SendBulkSmsWorker constructor(
     override suspend fun doWork(): Result {
         Timber.e("Worker starts")
         val bulkSms = bulkSmsDao.bulkSmsWithRowId(rowId)
-        val smsContacts = bulkSms.smsContacts
-        val contactListSize = smsContacts.count()
-        val remainSmsSentNumbers = smsContacts.filter { !it.isSent }
+        val smsContactsMessages = bulkSms.smsContactsMessages
+        val contactListSize = smsContactsMessages.count()
+        val remainSmsSentNumbers = smsContactsMessages.filter { !it.isSent }
         var smsCountProgress = contactListSize - remainSmsSentNumbers.count()
         notificationManager.notify(
             notificationId, notificationBuilder.setProgress(
@@ -94,27 +94,27 @@ class SendBulkSmsWorker constructor(
         )
         val smsDelayValue =
             (sharedPreferenceHelper.getInt(BULK_SMS_MESSAGE_DELAY_SECONDS).toLong()) * 1000
-        val smsContent = bulkSms.smsContent
-        val smsDivides = smsManager.divideMessage(smsContent)
         val sourceSmsAddress = sharedPreferenceHelper.getString(BULK_SMS_PREFERRED_CARRIER_NUMBER)
-        Timber.e("Source sms address -> $sourceSmsAddress and content -> $smsContent")
-        for (smsContact in remainSmsSentNumbers) {
-            if (smsContent.length < SMS_CONTENT_LENGTH_LIMIT)
+        Timber.e("Source sms address -> $sourceSmsAddress")
+        for (smsContactMessage in remainSmsSentNumbers) {
+            if (smsContactMessage.message.length < SMS_CONTENT_LENGTH_LIMIT)
                 smsManager.sendTextMessage(
-                    smsContact.contactNumber, null, smsContent, null, null
+                    smsContactMessage.contactNumber, null, smsContactMessage.message, null, null
                 )
-            else
+            else {
+                val smsDivides = smsManager.divideMessage(smsContactMessage.message)
                 smsManager.sendMultipartTextMessage(
-                    smsContact.contactNumber, null, smsDivides, null, null
+                    smsContactMessage.contactNumber, null, smsDivides, null, null
                 )
+            }
             delay(smsDelayValue)
             notificationBuilder.setProgress(contactListSize, ++smsCountProgress, false)
                 .setContentTitle(SENDING_BULK_SMS.plus(" $smsCountProgress/$contactListSize"))
                 .also {
                     notificationManager.notify(notificationId, it.build())
                 }
-            smsContact.isSent = true
-            bulkSmsDao.update(smsContacts, rowId)
+            smsContactMessage.isSent = true
+            bulkSmsDao.update(smsContactsMessages, rowId)
         }
         setNotificationCompleteStatus()
         val endTime = System.currentTimeMillis()

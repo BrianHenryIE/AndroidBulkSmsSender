@@ -1,9 +1,11 @@
 package spartons.com.prosmssenderapp.helper
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityCompat.startActivityForResult
 import com.afollestad.materialdialogs.LayoutMode
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.bottomsheets.BottomSheet
@@ -14,11 +16,13 @@ import com.afollestad.materialdialogs.files.fileChooser
 import com.afollestad.materialdialogs.list.listItemsSingleChoice
 import java.io.File
 
+
 /**
  * Ahsen Saeed}
  * ahsansaeed067@gmail.com}
  * 6/25/19}
  */
+const val PICK_CSV_FILE = 2
 
 class UiHelper {
 
@@ -54,12 +58,12 @@ class UiHelper {
         }
     }
 
-    fun showSelectContactFileDialog(activity: Activity, selectedFileClosure: (File) -> Unit) {
-        val myFilter: FileFilter = { it.name.endsWith(".txt") || it.isDirectory }
+    /*fun showSelectContactFileDialog(activity: Activity, selectedFileClosure: (File) -> Unit) {
+        val myFilter: FileFilter = { it.isDirectory || ( it.isFile || it.name.endsWith(".csv"))}
         MaterialDialog(activity).show {
             cornerRadius(16f)
             noAutoDismiss()
-            title(text = "Choose Contact file with .txt extension")
+            title(text = "Choose Contact file with .csv extension")
             positiveButton(text = "SELECT")
             negativeButton(text = "CANCEL") { materialDialog ->
                 materialDialog.dismiss()
@@ -69,7 +73,7 @@ class UiHelper {
                 selectedFileClosure.invoke(file)
             }
         }
-    }
+    }*/
 
     fun showBottomSheetDialog(
         activity: Activity, @StringRes content: Int, @StringRes title: Int,

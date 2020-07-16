@@ -53,9 +53,9 @@ class BulkSmsViewHolder constructor(override val containerView: View) :
 
     fun bind(bulkSms: BulkSms) {
         val context = containerView.context
-        val contactsSms = bulkSms.smsContacts
+        val contactsMessagesSms = bulkSms.smsContactsMessages
         val textContent = context.getResourceString(R.string.no_of_sms_sent)
-            .plus(" ${contactsSms.filter { it.isSent }.count()}/${contactsSms.count()}")
+            .plus(" ${contactsMessagesSms.filter { it.isSent }.count()}/${contactsMessagesSms.count()}")
         smsHistorySingleViewSmsCountTextView.text = textContent
         if (bulkSms.bulkSmsStatus == BulkSmsStatus.COMPLETE || bulkSms.bulkSmsStatus == BulkSmsStatus.CANCELLED) {
             smsHistorySingleViewDeleteImageView.visibility = VISIBLE
@@ -64,20 +64,8 @@ class BulkSmsViewHolder constructor(override val containerView: View) :
             smsHistorySingleViewDeleteImageView.visibility = GONE
             smsHistorySingleViewCancelImageView.visibility = VISIBLE
         }
-        val contentTextViewSpans = SpannableStringBuilder()
-            .bold {
-                color(context.getMutedColor(R.color.colorSecondaryText)) {
-                    append(context.getResourceString(R.string.sms_content_colon))
-                }
-            }.color(context.getMutedColor(R.color.colorPrimaryText)) {
-                append(" ".plus(bulkSms.smsContent))
-            }
         if (bulkSms.bulkSmsStatus == BulkSmsStatus.CANCELLED)
             smsHistorySingleViewProcessCancelledTextView.visibility = VISIBLE
-        smsHistorySingleViewSmsContentTextView.setText(
-            contentTextViewSpans,
-            TextView.BufferType.SPANNABLE
-        )
         val startTimeDateFormat = dateFormatter.format(bulkSms.startDateTime.toDate())
         smsHistorySingleViewSmsStartTextView.text = startTimeDateFormat
         val endDatetime = bulkSms.endDateTime

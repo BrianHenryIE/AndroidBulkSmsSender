@@ -134,9 +134,9 @@ class SettingsFragment : BaseFragment() {
         val delayValue = sharedPreferenceHelper.getInt(BULK_SMS_MESSAGE_DELAY_SECONDS)
         bulkSmsSettingDelayTextView.text = delayValue.toString()
 
-        mRootView.findViewById<MaterialButton>(R.id.bulkSmsSettingShowAdButton).setOnClickListener {
-            requireActivity().snackbar(mRootView, getResourceString(R.string.feature_not_added_yet))
-        }
+  //      mRootView.findViewById<MaterialButton>(R.id. bulkSmsSettingShowAdButton).setOnClickListener {
+  //          requireActivity().snackbar(mRootView, getResourceString(R.string.feature_not_added_yet))
+  //      }
 
         val preferredCarrierNumber =
             sharedPreferenceHelper.getString(SharedPreferenceHelper.BULK_SMS_PREFERRED_CARRIER_NUMBER)

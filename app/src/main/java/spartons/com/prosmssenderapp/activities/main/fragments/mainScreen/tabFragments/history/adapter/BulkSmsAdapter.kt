@@ -38,7 +38,7 @@ class BulkSmsAdapter(
                 oldItem.id == newItem.id
 
             override fun areContentsTheSame(oldItem: BulkSms, newItem: BulkSms) =
-                oldItem.startDateTime == newItem.startDateTime && oldItem.endDateTime == newItem.endDateTime && oldItem.smsContent == newItem.smsContent && oldItem.smsContacts == newItem.smsContacts
+                oldItem.startDateTime == newItem.startDateTime && oldItem.endDateTime == newItem.endDateTime && oldItem.smsContactsMessages == newItem.smsContactsMessages
         }
     }
 

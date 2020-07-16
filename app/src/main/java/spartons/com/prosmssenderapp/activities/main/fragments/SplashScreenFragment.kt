@@ -25,7 +25,6 @@ class SplashScreenFragment : BaseFragment() {
     override fun getLayoutResId() = R.layout.fragment_splash_screen
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        splashScreenLogoImageView.setImageResource(R.drawable.pro_sms_sender_logo)
         requireActivity().getTypeface(TypeFaceEnum.WELCOME_MESSAGE_TYPEFACE).also {
             splashScreenWelcomeMessageTextView.typeface = it
         }
