@@ -58,23 +58,6 @@ class UiHelper {
         }
     }
 
-    /*fun showSelectContactFileDialog(activity: Activity, selectedFileClosure: (File) -> Unit) {
-        val myFilter: FileFilter = { it.isDirectory || ( it.isFile || it.name.endsWith(".csv"))}
-        MaterialDialog(activity).show {
-            cornerRadius(16f)
-            noAutoDismiss()
-            title(text = "Choose Contact file with .csv extension")
-            positiveButton(text = "SELECT")
-            negativeButton(text = "CANCEL") { materialDialog ->
-                materialDialog.dismiss()
-            }
-            fileChooser(filter = myFilter) { dialog, file ->
-                dialog.dismiss()
-                selectedFileClosure.invoke(file)
-            }
-        }
-    }*/
-
     fun showBottomSheetDialog(
         activity: Activity, @StringRes content: Int, @StringRes title: Int,
         positiveButtonText: String = "Submit", negativeButtonText: String = "Cancel",

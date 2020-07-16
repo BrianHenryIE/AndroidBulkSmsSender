@@ -5,7 +5,7 @@
     <string name="history">History</string>
     <string name="settings">Settings</string>
     <string name="about">About</string>
-    <string name="choose_a_txt_file">Choose a .txt file</string>
+    <string name="choose_a_txt_file">Choose a .csv file</string>
     <string name="message">Write your message here</string>
     <string name="send_bulk_sms">Send Bulk Sms</string>
     <string name="storage_permission_denied_content">Pro Sms Sender App requires the <b>Storage Permission</b> in order to read
@@ -17,9 +17,9 @@
     <string name="sms_permission_denied">Sms Permission Denied</string>
     <string name="storage_permission_denied">Storage Permission Denied</string>
     <string name="the_selected_file_is_empty">The selected file is empty. Please select file of user contacts.</string>
-    <string name="add_another_text_file">Add another .txt file</string>
+    <string name="add_another_text_file">Add another .csv file</string>
     <string name="sms_content_cannot_be_empty">Sms content cannot be empty!</string>
-    <string name="please_first_select_contact_list">Please first select .txt contact list file.</string>
+    <string name="please_first_select_contact_list">Please first select .csv contact list file.</string>
     <string name="note_colon">Note :</string>
     <string name="avoid_blocking_your_sim_content">In order to send bulk sms to your customers you need to add delay
         after sending one sms. For example, in Pakistan your sim will be blocked if you send 200 sms with in 15 minutes.
@@ -43,7 +43,7 @@
         send any bulk sms yet or maybe your history is turned off.
     </string>
     <string name="all_sms_history_deleted_successfully">All sms history deleted successfully.</string>
-    <string name="about_app_content">-> Get your messages across with Pro Sms Bulk Sender App. Using this platform you can quickly send any short and important message to worldwide or locally in your country. You can easily send SMS alerts or promotional messages from your mobile. The sms charges may apply for sending the messages. \n\n -> This is a small and powerful application that enables users to send generic and customized SMS messages through their carrier network to contact that are listed in a .txt input file. \n\n Contact Me\n\n <strong>email: </strong>ahsansaeed067@gmail.com\n <strong>Website: </strong>ahsensaeed.com/contact-me</string>
+    <string name="about_app_content">-> Get your messages across with Pro Sms Bulk Sender App. Using this platform you can quickly send any short and important message to worldwide or locally in your country. You can easily send SMS alerts or promotional messages from your mobile. The sms charges may apply for sending the messages. \n\n -> This is a small and powerful application that enables users to send generic and customized SMS messages through their carrier network to contact that are listed in a .csv input file. \n\n Contact Me\n\n <strong>email: </strong>ahsansaeed067@gmail.com\n <strong>Website: </strong>ahsensaeed.com/contact-me</string>
     <string name="sms_sent_successfully_content">All sms of recipients will be sent successfully. You can track progress
         in the notification bar.
     </string>
@@ -71,4 +71,5 @@
     <string name="limit_exceeds_please_send_bulk_sms_less_than_thousand_contacts">Limit exceeds please send bulk sms less than thousand contacts</string>
     <string name="number_of_contacts_showing">Number of contacts showing : %1$d</string>
     <string name="contact_list_must_not_be_empty">Contact list must not be empty!</string>
+    <string name="example_message">Example message</string>
 </resources>

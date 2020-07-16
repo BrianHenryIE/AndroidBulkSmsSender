@@ -93,10 +93,7 @@ class SendBulkSmsViewModel constructor(
             val filteredContactMessageList = CsvReader().readAll(selectedFile).filter { contactNumberMessage ->
                 contactNumberMessage[0].length > 6 }.map { toSmsContactMessage(it[0], it[1]) }
             if (filteredContactMessageList.isNotEmpty()) {
-                if (filteredContactMessageList.count() > 4)
-                    emitUiState(contactMessageList = Event(filteredContactMessageList.subList(1, 3)))
-                else
-                    emitUiState(contactMessageList = Event(filteredContactMessageList))
+                emitUiState(contactMessageList = Event(filteredContactMessageList))
             }
             else
                 emitUiState(showMessage = Event(R.string.the_selected_file_is_empty))
